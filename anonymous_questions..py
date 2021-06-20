@@ -1,7 +1,7 @@
-import streamlit as st
-import pandas as pd
 import hashlib
 import time
+
+import streamlit as st
 
 st.set_page_config("Mendaki Anonymous questions voting")
 
@@ -14,7 +14,6 @@ def questions_list():
 @st.cache(allow_output_mutation=True)
 def questions_hash_list():
     return []
-
 
 
 @st.cache(allow_output_mutation=True, persist=True)
@@ -111,4 +110,3 @@ while True:
                 vote_question(q_i, question_board_header)
 
     time.sleep(1)
-
