@@ -10,7 +10,7 @@ def create_admin_add_question_form():
         st.subheader("Add a new question")
         st.text_area("Write your question here", key="new_question_text")
         st.form_submit_button("Add question",
-                              help=f"Question to be posted to this panel: {st.session_state['selected_panel'] +1}",
+                              help=f"Question to be posted to this panel: {st.session_state['selected_panel'] + 1}",
                               on_click=add_question,
                               kwargs={"all_panels": GlobalPanels,
                                       "question_text_key": 'new_question_text'}

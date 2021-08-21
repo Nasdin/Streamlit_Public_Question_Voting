@@ -4,7 +4,7 @@ import streamlit as st
 
 from question_voting.authorization import create_sidebar_admin_pass_input, is_authorized
 from question_voting.data_export import create_data_export_widget
-from question_voting.global_states import GlobalPanels, ViewMode
+from question_voting.global_states import ViewMode
 from question_voting.panels import create_main_panel_admin_widget, DisplayStatementsInPanel, \
     create_clear_panel_container, DisplayReportingModeInPanel
 from question_voting.questions import create_admin_add_question_form
