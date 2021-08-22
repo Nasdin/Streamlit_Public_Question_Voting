@@ -163,73 +163,82 @@ class DisplayReportingModeInPanel(object):
 
         question_highest_upvotes.header("Question Analysis")
 
-        upvote_chart, downvote_chart = question_highest_upvotes.columns(2)
-        upvote_chart.subheader("Upvotes Live (Top 5)")
-        upvotes_df = all_questions.sort_values('votes', ascending=False).head(5).set_index('text')['votes']
-        upvote_chart.bar_chart(upvotes_df)
+        if all_questions.shape[0] > 0:
+            upvote_chart, downvote_chart = question_highest_upvotes.columns(2)
+            upvote_chart.subheader("Upvotes Live (Top 5)")
+            upvotes_df = all_questions.sort_values('votes', ascending=False).head(5).set_index('text')['votes']
+            upvote_chart.bar_chart(upvotes_df)
 
-        downvote_chart.subheader("Downvotes Live (Top 5)")
-        downvotes_df = all_questions.sort_values('downvotes', ascending=False).head(5).set_index('text')['downvotes']
-        downvote_chart.bar_chart(downvotes_df)
+            downvote_chart.subheader("Downvotes Live (Top 5)")
+            downvotes_df = all_questions.sort_values('downvotes', ascending=False).head(5).set_index('text')[
+                'downvotes']
+            downvote_chart.bar_chart(downvotes_df)
 
-        question_highest_upvotes.subheader("Most comments Live (Top 5)")
-        all_questions['comment_count'] = all_questions['comments'].apply(lambda x: len(x))
-        most_comments_df = all_questions.sort_values('comment_count', ascending=False).head(5).set_index('text')[
-            'comment_count']
-        question_highest_upvotes.bar_chart(most_comments_df)
+            question_highest_upvotes.subheader("Most comments Live (Top 5)")
+            all_questions['comment_count'] = all_questions['comments'].apply(lambda x: len(x))
+            most_comments_df = all_questions.sort_values('comment_count', ascending=False).head(5).set_index('text')[
+                'comment_count']
+            question_highest_upvotes.bar_chart(most_comments_df)
 
-        question_highest_upvotes.subheader("Question with highest upvote")
-        question_highest_upvotes.write("##### Question")
-        question_highest_upvotes.write(all_questions.loc[all_questions['votes'].argmax(), 'text'])
-        question_highest_upvotes.write(f"Upvotes: {all_questions['votes'].max()}")
+            question_highest_upvotes.subheader("Question with highest upvote")
+            question_highest_upvotes.write("##### Question")
+            question_highest_upvotes.write(all_questions.loc[all_questions['votes'].argmax(), 'text'])
+            question_highest_upvotes.write(f"Upvotes: {all_questions['votes'].max()}")
 
-        question_highest_downvotes.subheader("Question with highest downvotes")
-        question_highest_downvotes.write("##### Question")
-        question_highest_downvotes.write(all_questions.loc[all_questions['downvotes'].argmax(), 'text'])
-        question_highest_downvotes.write(f"Downvotes: {all_questions['downvotes'].max()}")
+            question_highest_downvotes.subheader("Question with highest downvotes")
+            question_highest_downvotes.write("##### Question")
+            question_highest_downvotes.write(all_questions.loc[all_questions['downvotes'].argmax(), 'text'])
+            question_highest_downvotes.write(f"Downvotes: {all_questions['downvotes'].max()}")
 
-        question_highest_overall.subheader("Question with highest overall")
-        question_highest_overall.write("##### Question")
-        question_highest_overall.write(
-            all_questions.loc[((all_questions['downvotes'] * -1) + all_questions['votes']).argmax(), 'text'])
-        question_highest_overall.write(
-            f"Highest overall: {((all_questions['downvotes'] * -1) + all_questions['votes']).max()}")
+            question_highest_overall.subheader("Question with highest overall")
+            question_highest_overall.write("##### Question")
+            question_highest_overall.write(
+                all_questions.loc[((all_questions['downvotes'] * -1) + all_questions['votes']).argmax(), 'text'])
+            question_highest_overall.write(
+                f"Highest overall: {((all_questions['downvotes'] * -1) + all_questions['votes']).max()}")
 
-        question_lowest_overall.subheader("Question with lowest overall")
-        question_lowest_overall.write("##### Question")
-        question_lowest_overall.write(
-            all_questions.loc[((all_questions['downvotes'] * -1) + all_questions['votes']).argmin(), 'text'])
-        question_lowest_overall.write(
-            f"Lowest overall: {((all_questions['downvotes'] * -1) + all_questions['votes']).min()}")
+            question_lowest_overall.subheader("Question with lowest overall")
+            question_lowest_overall.write("##### Question")
+            question_lowest_overall.write(
+                all_questions.loc[((all_questions['downvotes'] * -1) + all_questions['votes']).argmin(), 'text'])
+            question_lowest_overall.write(
+                f"Lowest overall: {((all_questions['downvotes'] * -1) + all_questions['votes']).min()}")
 
-        question_most_comments.subheader("Question with most comments")
-        question_most_comments.write("##### Question")
-        question_most_comments.write(
-            all_questions.loc[all_questions['comments'].apply(lambda x: len(x)).argmax(), 'text'])
-        question_most_comments.write(f"Most comments: {all_questions['comments'].apply(lambda x: len(x)).max()}")
+            question_most_comments.subheader("Question with most comments")
+            question_most_comments.write("##### Question")
+            question_most_comments.write(
+                all_questions.loc[all_questions['comments'].apply(lambda x: len(x)).argmax(), 'text'])
+            question_most_comments.write(f"Most comments: {all_questions['comments'].apply(lambda x: len(x)).max()}")
+
+        else:
+            question_highest_upvotes.subheader("No question has been posted yet")
 
         question_most_upvoted_comments = self.question_most_upvoted_comments.container()
         question_most_downvoted_comments = self.question_most_downvoted_comments.container()
 
         question_most_upvoted_comments.header("Comments analysis")
-        question_most_upvoted_comments.subheader("Highest upvoted comment")
-        question_most_upvoted_comments.write("##### Comment")
-        question_most_upvoted_comments.write(all_comments.loc[all_comments['votes'].argmax(), 'text'])
-        question_most_upvoted_comments.write(f"Upvotes: {all_comments['votes'].max()}")
 
-        question_most_downvoted_comments.subheader("Highest downvoted comment")
-        question_most_downvoted_comments.write("##### Comment")
-        question_most_downvoted_comments.write(all_comments.loc[all_comments['downvotes'].argmax(), 'text'])
-        question_most_downvoted_comments.write(f"Downvotes: {all_comments['downvotes'].max()}")
+        if all_comments.shape[0] > 0:
+            question_most_upvoted_comments.subheader("Highest upvoted comment")
+            question_most_upvoted_comments.write("##### Comment")
+            question_most_upvoted_comments.write(all_comments.loc[all_comments['votes'].argmax(), 'text'])
+            question_most_upvoted_comments.write(f"Upvotes: {all_comments['votes'].max()}")
 
-        upvote_chart, downvote_chart = question_most_downvoted_comments.columns(2)
-        upvote_chart.subheader("Upvotes comments Live (Top 5)")
-        upvotes_df = all_comments.sort_values('votes', ascending=False).head(5).set_index('text')['votes']
-        upvote_chart.bar_chart(upvotes_df)
+            question_most_downvoted_comments.subheader("Highest downvoted comment")
+            question_most_downvoted_comments.write("##### Comment")
+            question_most_downvoted_comments.write(all_comments.loc[all_comments['downvotes'].argmax(), 'text'])
+            question_most_downvoted_comments.write(f"Downvotes: {all_comments['downvotes'].max()}")
 
-        downvote_chart.subheader("Downvotes comments Live (Top 5)")
-        downvotes_df = all_comments.sort_values('downvotes', ascending=False).head(5).set_index('text')['downvotes']
-        downvote_chart.bar_chart(downvotes_df)
+            upvote_chart, downvote_chart = question_most_downvoted_comments.columns(2)
+            upvote_chart.subheader("Upvotes comments Live (Top 5)")
+            upvotes_df = all_comments.sort_values('votes', ascending=False).head(5).set_index('text')['votes']
+            upvote_chart.bar_chart(upvotes_df)
+
+            downvote_chart.subheader("Downvotes comments Live (Top 5)")
+            downvotes_df = all_comments.sort_values('downvotes', ascending=False).head(5).set_index('text')['downvotes']
+            downvote_chart.bar_chart(downvotes_df)
+        else:
+            question_most_upvoted_comments.subheader("No comments have been added yet")
 
         if not has_updates:
             self.stale_preventor.write("There are no questions posted")
