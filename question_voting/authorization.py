@@ -1,6 +1,9 @@
 import streamlit as st
 
-PASSWORD = "mendaki"
+try:
+    PASSWORD = st.secrets['admin_password']
+except FileNotFoundError:
+    PASSWORD = 'mendaki'
 
 
 def create_sidebar_admin_pass_input():
