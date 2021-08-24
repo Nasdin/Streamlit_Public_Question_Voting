@@ -82,6 +82,8 @@ class DisplayStatement(object):
                  statement: Union[Question, Comment], ):
         self.container = container
         self.statement = statement
+        self.previous_statement_votes = self.statement.votes
+        self.previous_statement_downvotes = self.statement.downvotes
         self.comments_built = {}
 
         self.text_box = None
@@ -90,6 +92,8 @@ class DisplayStatement(object):
         self.upvote_count_box = None
         self.downvote_count_box = None
         self.comment_box = None
+        self.comments_container = None
+        self.comment_count = None
 
         self.upvote_key = None
         self.downvote_key = None
@@ -98,63 +102,58 @@ class DisplayStatement(object):
         self.update_upvote()
         key = str(self.statement.hash) + "_upvote"
         if self.statement.statement_type == "Comment":
-            key = key + str(self.statement.parent) + str(uuid.uuid4())
+            key = key + str(self.statement.parent)
         self.upvote_key = key
-        self.to_upvote.button("Upvote", on_click=self.statement.upvote, args=[key + "changer"], key=key,
+        self.to_upvote.button("👍", on_click=self.statement.upvote, args=[key + "changer"], key=key,
                               help="Upvote if you agree")
 
     def update_upvote(self):
-        self.upvote_count_box.write(f"Upvotes: {self.statement.votes}")
+        self.upvote_count_box.metric(label="Upvotes", value=self.statement.votes,
+                                     delta=self.statement.votes - self.previous_statement_votes,
+                                     delta_color='normal')
 
     def build_downvote(self):
         self.update_downvote()
         key = str(self.statement.hash) + "_downvote"
         if self.statement.statement_type == "Comment":
-            key = key + str(self.statement.parent) + str(uuid.uuid4())
+            key = key + str(self.statement.parent)
         self.downvote_key = key
-        self.to_downvote.button("Downvote", on_click=self.statement.downvote, args=[key + "changer"], key=key,
+        self.to_downvote.button("👎", on_click=self.statement.downvote, args=[key + "changer"], key=key,
                                 help="Downvote if you think this is irrelevant")
 
     def update_downvote(self):
-        self.downvote_count_box.write(f"Downvotes: {self.statement.downvotes}")
+        self.downvote_count_box.metric(label="Downvotes",
+                                       value=self.statement.downvotes,
+                                       delta=self.statement.downvotes - self.previous_statement_downvotes,
+                                       delta_color='inverse')
 
     def update_comments_section(self):
 
-        comment_container = self.comment_box.container()
-        with comment_container.expander(f"Total Comments: {self.statement.comment_count()}"):
-            for comment in self.statement.comments:
+        self.populate_comments(self.comments_container)
+        for displayed_comments_has, displayed_comments in self.comments_built.items():
+            displayed_comments.update()
 
-                if comment.hash not in self.comments_built:
-                    displayed_statement = DisplayStatement(st, comment)
-                    self.comments_built[comment.hash] = displayed_statement
-                else:
-                    displayed_statement = self.comments_built[comment.hash]
-                    # Needs to delete previously built so that we can build again
-                    displayed_statement.unbuild()
+    def populate_comments(self, container):
+        self.comment_count.write(f"Total Comments: {self.statement.comment_count()}")
+        for comment in self.statement.comments:
+            if comment.hash not in self.comments_built:
+                displayed_statement = DisplayStatement(container, comment)
                 displayed_statement.build()
-                displayed_statement.update()
+                self.comments_built[comment.hash] = displayed_statement
 
     def build_comments_section(self):
         create_add_comments_form(self.container, self.statement)
-        self.update_comments_section()
-
-    def unbuild(self):
-        del st.session_state[self.downvote_key]
-        del st.session_state[self.upvote_key]
-        del self.to_upvote
-        del self.to_downvote
-        del self.text_box
-        del self.upvote_count_box
-        del self.downvote_count_box
-        del self.comment_box
+        self.comment_count = self.comment_box.empty()
+        self.comments_container = self.comment_box.expander(f"View Comments")
+        self.populate_comments(self.comments_container)
 
     def init_build(self):
         self.container.write(f"### {self.statement.statement_type}: ")
-        self.text_box, self.to_upvote, self.to_downvote = self.container.columns(3)
+        self.text_box, self.to_upvote, self.to_downvote = self.container.columns([5, 1, 1])
 
         self.upvote_count_box = self.to_upvote.empty()
         self.downvote_count_box = self.to_downvote.empty()
-        self.comment_box = self.container.empty()
+        self.comment_box = self.container.container()
 
     def build(self):
         self.init_build()

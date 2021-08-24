@@ -73,8 +73,10 @@ def create_create_panel_container(create_container):
 
 
 def create_clear_panel_container():
-    st.sidebar.selectbox("Clear Panel", options=get_panels(),
-                         on_change=clear_panel, key="clear_panel", format_func=lambda x: str(x + 1))
+    with st.sidebar.form("Clear containers"):
+        st.selectbox("Clear Panel", options=get_panels(),
+                     key="clear_panel", format_func=lambda x: str(x + 1))
+        st.form_submit_button("Clear", on_click=clear_panel)
 
 
 def create_main_panel_admin_widget(panel_count):

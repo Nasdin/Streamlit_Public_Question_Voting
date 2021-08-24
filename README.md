@@ -1,6 +1,6 @@
 # Streamlit Real-Time Question voting dashboard
 
-Hosted Link - https://share.streamlit.io/nasdin/streamlit_public_question_voting/main/anonymous_questions.py
+Hosted Link - https://share.streamlit.io/nasdin/streamlit_public_question_voting/main/main.py
 
 Streamlit is usually thought of a static dashboard without any intercommunication capabilities.
 
