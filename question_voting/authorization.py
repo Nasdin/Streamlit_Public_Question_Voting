@@ -1,6 +1,6 @@
 import streamlit as st
 
-PASSWORD = st.secrets['admin_password']
+PASSWORD = st.secrets["admin_password"]
 
 
 def create_sidebar_admin_pass_input():

@@ -5,24 +5,22 @@ import streamlit as st
 
 
 class ViewMode(object):
-
     @staticmethod
     def mode():
         if "viewing_mode" not in st.session_state:
-            st.session_state['viewing_mode'] = "VOTING"
-        return st.session_state['viewing_mode']
+            st.session_state["viewing_mode"] = "VOTING"
+        return st.session_state["viewing_mode"]
 
     @staticmethod
     def reporting():
-        st.session_state['viewing_mode'] = "REPORTING"
+        st.session_state["viewing_mode"] = "REPORTING"
 
     @staticmethod
     def voting():
-        st.session_state['viewing_mode'] = "VOTING"
+        st.session_state["viewing_mode"] = "VOTING"
 
 
 class GlobalSharedStatements(object):
-
     def __init__(self, number):
         self.id = number
 
@@ -30,10 +28,12 @@ class GlobalSharedStatements(object):
     def statements(self):
         return self._statements(self.id)
 
-    @st.cache(persist=True,
-              allow_output_mutation=True,
-              show_spinner=False,
-              suppress_st_warning=True)
+    @st.cache(
+        persist=True,
+        allow_output_mutation=True,
+        show_spinner=False,
+        suppress_st_warning=True,
+    )
     def _statements(self, x):
         return OrderedDict()
 
@@ -47,10 +47,12 @@ class GlobalPanels(object):
     dict_type = dict
 
     @classmethod
-    @st.cache(persist=True,
-              allow_output_mutation=True,
-              show_spinner=False,
-              suppress_st_warning=True)
+    @st.cache(
+        persist=True,
+        allow_output_mutation=True,
+        show_spinner=False,
+        suppress_st_warning=True,
+    )
     def _secret_stash(cls) -> Dict[int, GlobalSharedStatements]:
         return cls.dict_type()
 

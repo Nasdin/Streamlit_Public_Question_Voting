@@ -9,16 +9,17 @@ from typing import List, Union
 import streamlit as st
 
 if "statements_built" not in st.session_state:
-    st.session_state['statements_built'] = []
+    st.session_state["statements_built"] = []
 
 
 @dataclass
 class Statement:
     """Class for keeping track of metadata regarding a single question or comment"""
+
     text: str
     votes: int = 0
     downvotes: int = 0
-    comments: List['Comment'] = field(default_factory=list)
+    comments: List["Comment"] = field(default_factory=list)
     hash: uuid.UUID = field(init=False)
     timestamp: datetime.datetime = field(init=False)
 
@@ -55,12 +56,14 @@ class Statement:
 @dataclass
 class Question(Statement):
     """ A question posted by the admin"""
+
     statement_type: str = "Question"
 
 
 @dataclass
 class Comment(Statement):
     """ Like a statement, but a comment cannot be made for a comment. It also has to be tagged to a parent statement"""
+
     statement_type: str = "Comment"
     parent: str = field(init=False)
 
@@ -76,10 +79,9 @@ def vote_key_swap(key):
 
 
 class DisplayStatement(object):
-
-    def __init__(self,
-                 container: st,
-                 statement: Union[Question, Comment], ):
+    def __init__(
+        self, container: st, statement: Union[Question, Comment],
+    ):
         self.container = container
         self.statement = statement
         self.previous_statement_votes = self.statement.votes
@@ -104,13 +106,21 @@ class DisplayStatement(object):
         if self.statement.statement_type == "Comment":
             key = key + str(self.statement.parent)
         self.upvote_key = key
-        self.to_upvote.button("👍", on_click=self.statement.upvote, args=[key + "changer"], key=key,
-                              help="Upvote if you agree")
+        self.to_upvote.button(
+            "👍",
+            on_click=self.statement.upvote,
+            args=[key + "changer"],
+            key=key,
+            help="Upvote if you agree",
+        )
 
     def update_upvote(self):
-        self.upvote_count_box.metric(label="Upvotes", value=self.statement.votes,
-                                     delta=self.statement.votes - self.previous_statement_votes,
-                                     delta_color='normal')
+        self.upvote_count_box.metric(
+            label="Upvotes",
+            value=self.statement.votes,
+            delta=self.statement.votes - self.previous_statement_votes,
+            delta_color="normal",
+        )
 
     def build_downvote(self):
         self.update_downvote()
@@ -118,14 +128,21 @@ class DisplayStatement(object):
         if self.statement.statement_type == "Comment":
             key = key + str(self.statement.parent)
         self.downvote_key = key
-        self.to_downvote.button("👎", on_click=self.statement.downvote, args=[key + "changer"], key=key,
-                                help="Downvote if you think this is irrelevant")
+        self.to_downvote.button(
+            "👎",
+            on_click=self.statement.downvote,
+            args=[key + "changer"],
+            key=key,
+            help="Downvote if you think this is irrelevant",
+        )
 
     def update_downvote(self):
-        self.downvote_count_box.metric(label="Downvotes",
-                                       value=self.statement.downvotes,
-                                       delta=self.statement.downvotes - self.previous_statement_downvotes,
-                                       delta_color='inverse')
+        self.downvote_count_box.metric(
+            label="Downvotes",
+            value=self.statement.downvotes,
+            delta=self.statement.downvotes - self.previous_statement_downvotes,
+            delta_color="inverse",
+        )
 
     def update_comments_section(self):
 
@@ -149,7 +166,9 @@ class DisplayStatement(object):
 
     def init_build(self):
         self.container.write(f"### {self.statement.statement_type}: ")
-        self.text_box, self.to_upvote, self.to_downvote = self.container.columns([5, 1, 1])
+        self.text_box, self.to_upvote, self.to_downvote = self.container.columns(
+            [5, 1, 1]
+        )
 
         self.upvote_count_box = self.to_upvote.empty()
         self.downvote_count_box = self.to_downvote.empty()
@@ -175,9 +194,12 @@ class DisplayStatement(object):
 def create_add_comments_form(container: st, parent_statement: Question):
     with container.form(key=f"add_question_form_{parent_statement.hash}"):
         st.subheader("Add a comment")
-        st.text_area("Write your comment here", key=f"new_comment_text_{parent_statement.hash}")
-        st.form_submit_button("Add comment",
-                              help=f"Comment to be posted to this question",
-                              on_click=parent_statement.add_comment,
-                              kwargs={"comment_key": f"new_comment_text_{parent_statement.hash}"}
-                              )
+        st.text_area(
+            "Write your comment here", key=f"new_comment_text_{parent_statement.hash}"
+        )
+        st.form_submit_button(
+            "Add comment",
+            help=f"Comment to be posted to this question",
+            on_click=parent_statement.add_comment,
+            kwargs={"comment_key": f"new_comment_text_{parent_statement.hash}"},
+        )
